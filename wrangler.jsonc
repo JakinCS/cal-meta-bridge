@@ -6,7 +6,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "cal-meta-bridge",
 	"main": "src/index.js",
-	"compatibility_date": "2026-07-07",
+	"compatibility_date": "2026-07-06",
 	"observability": {
 		"enabled": true
 	},

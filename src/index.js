@@ -1,15 +1,54 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+async function sha256(text) {
+  const data = new TextEncoder().encode(text.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function verifySignature(secret, body, signature) {
+  const key = await crypto.subtle.importKey(
+    "raw", new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(body));
+  const computed = Array.from(new Uint8Array(mac))
+    .map(b => b.toString(16).padStart(2, "0")).join("");
+  return computed === signature;
+}
 
 export default {
-	async fetch(request, env, ctx) {
-		return new Response("Hello World!");
-	},
+  async fetch(request, env) {
+    const rawBody = await request.text();
+    const signature = request.headers.get("x-cal-signature-256");
+
+    if (!(await verifySignature(env.CAL_WEBHOOK_SECRET, rawBody, signature))) {
+      return new Response("Invalid signature", { status: 401 });
+    }
+
+    const booking = JSON.parse(rawBody);
+    const attendee = booking.payload.attendees[0];
+    const [firstName, ...rest] = (attendee.name || "").split(" ");
+    const lastName = rest.join(" ");
+    const phoneDigits = (attendee.phone || "").replace(/\D/g, "");
+
+    const zarazPayload = {
+      events: [{
+        client: {
+          __zarazTrack: "cal_booking_created",
+          em: attendee.email ? await sha256(attendee.email) : "",
+          fn: firstName ? await sha256(firstName) : "",
+          ln: lastName ? await sha256(lastName) : "",
+          ph: phoneDigits ? await sha256(phoneDigits) : ""
+        }
+      }]
+    };
+
+    await fetch("https://yourdomain.com/zaraz/lead-events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(zarazPayload)
+    });
+
+    return new Response("ok");
+  }
 };

@@ -38,7 +38,8 @@ export default {
           em: attendee.email ? await sha256(attendee.email) : "",
           fn: firstName ? await sha256(firstName) : "",
           ln: lastName ? await sha256(lastName) : "",
-          ph: phoneDigits ? await sha256(phoneDigits) : ""
+          ph: phoneDigits ? await sha256(phoneDigits) : "",
+					test_event_code: "TEST10075"
         }
       }]
     };

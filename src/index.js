@@ -1,6 +1,3 @@
-/* 
- Connect to Cal.com
-*/
 async function sha256(text) {
   const data = new TextEncoder().encode(text.trim().toLowerCase());
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -47,7 +44,7 @@ export default {
       }]
     };
 
-    const zarazResponse = await fetch("https://webchargedsolutions.com/zaraz/lead-events", {
+    const zarazResponse = await fetch("https://webchargedsolutions.com/c/c", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(zarazPayload)

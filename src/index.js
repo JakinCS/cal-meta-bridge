@@ -30,7 +30,7 @@ export default {
     const attendee = booking.payload.attendees[0];
     const [firstName, ...rest] = (attendee.name || "").split(" ");
     const lastName = rest.join(" ");
-    const phoneDigits = (attendee.phone || "").replace(/\D/g, "");
+    const phoneDigits = (attendee.phoneNumber || "").replace(/\D/g, "");
 
     const zarazPayload = {
       events: [{

@@ -26,6 +26,7 @@ export default {
     }
 
     const booking = JSON.parse(rawBody);
+		console.log("Full booking payload:", JSON.stringify(booking.payload));
     const attendee = booking.payload.attendees[0];
     const [firstName, ...rest] = (attendee.name || "").split(" ");
     const lastName = rest.join(" ");

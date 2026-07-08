@@ -47,11 +47,14 @@ export default {
       }]
     };
 
-    await fetch("https://yourdomain.com/zaraz/lead-events", {
+    const zarazResponse = await fetch("https://webchargedsolutions.com/zaraz/lead-events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(zarazPayload)
     });
+
+		console.log("Zaraz response status:", zarazResponse.status);
+		console.log("Payload sent:", JSON.stringify(zarazPayload));
 
     return new Response("ok");
   }

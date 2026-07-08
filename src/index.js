@@ -53,6 +53,7 @@ export default {
       body: JSON.stringify(zarazPayload)
     });
 
+		console.log("Zaraz response:", zarazResponse);
 		console.log("Zaraz response status:", zarazResponse.status);
 		console.log("Payload sent:", JSON.stringify(zarazPayload));
 

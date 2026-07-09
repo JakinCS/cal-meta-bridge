@@ -26,7 +26,6 @@ export default {
     }
 
     const booking = JSON.parse(rawBody);
-		console.log("Full booking payload:", JSON.stringify(booking.payload));
     const attendee = booking.payload.attendees[0];
     const [firstName, ...rest] = (attendee.name || "").split(" ");
     const lastName = rest.join(" ");
@@ -35,13 +34,13 @@ export default {
     const zarazPayload = {
       events: [{
         client: {
-          __zarazTrack: "cal_booking_created",
+          __zarazTrack: "cal_lead_internal",
           em: attendee.email ? await sha256(attendee.email) : "",
           fn: firstName ? await sha256(firstName) : "",
           ln: lastName ? await sha256(lastName) : "",
           ph: phoneDigits ? await sha256(phoneDigits) : "",
-					test_event_code: "TEST10075"
-        }
+        },
+				event_id: booking.payload.uid
       }]
     };
 
@@ -50,10 +49,6 @@ export default {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(zarazPayload)
     });
-
-		console.log("Zaraz response:", zarazResponse);
-		console.log("Zaraz response status:", zarazResponse.status);
-		console.log("Payload sent:", JSON.stringify(zarazPayload));
 
     return new Response("ok");
   }
